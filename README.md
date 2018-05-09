@@ -3,7 +3,7 @@
 ## Pre-requisites
 
 * Install JDK 8
-* Install Gradle
+* Install Gradle 4.6
 
 ## Run unit tests
 
