@@ -1,0 +1,50 @@
+group 'com.itexico'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.15'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'io.cucumber:cucumber-java8:2.3.1'
+    testCompile 'io.cucumber:cucumber-junit:2.3.1'
+}
+
+configurations {
+    acceptanceCompile.extendsFrom testCompile
+    acceptanceRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+
+    acceptance {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/acceptance/java')
+        }
+        resources.srcDir file('src/acceptance/resources')
+    }
+
+}
+
+task acceptance(type: Test) {
+    group = 'verification'
+    description = 'Runs acceptance tests - Cucumber'
+    testClassesDirs = sourceSets.acceptance.output.classesDirs
+    classpath = sourceSets.acceptance.runtimeClasspath
+    outputs.upToDateWhen { false } // Always rerun acceptance tests
+}
+
+acceptance.shouldRunAfter test // Unit tests first
+check.dependsOn(acceptance)
+check.shouldRunAfter clean
